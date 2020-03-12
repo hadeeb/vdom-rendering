@@ -25,6 +25,7 @@ function renderChildren(vnode, prevVNode) {
   vnode.childVNodes = children.map((child, index) => {
     child = ensureVNode(child);
     // Find previous node corresponding to this child node
+    // TODO: add more info about keyed updates
     const prevChildVNode = prevChildNodes.find((node, i) => {
       if (node) {
         if (node.type === child.type && child.key === node.key) {

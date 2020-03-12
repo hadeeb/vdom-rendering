@@ -2,13 +2,32 @@
  * Virtual node
  * @typedef VNode
  * @type {object}
- * @property {string|function} type Type of node. It could be a string, function or TEXT_NODE
+ * @property {string|function} type Type of node.
+ *
+ *        It will be a string for DOM elements like `div`,`button`,etc.
+ *
+ *        For conponents, it will the component function.
+ *
+ *        For text nodes, it will be TEXT_NODE
  * @property {any} props Properties of the node
- * @property {string|number|symbol|undefined} key
- * @property {VNode[]} children Children
+ *
+ *        eg: `id` of the `div` element, `initialCount` of the `Counter` component, etc.
+ * @property {string|number|symbol|undefined} key It is used to uniquely
+ *        identify a node in an array of nodes.
+ *
+ *        TODO: Add link to keyed update
+ * @property {VNode[]} children Children of the node aka the content of the node.
+ *
+ *        eg: the text inside a `button`
  * @property {any[]} hooks Component hooks
+ *
+ *        For component nodes, it's states & effects are stored here.
  * @property {HTMLElement|null} dom DOM element to which VNode is attached
- * @property {VNode[]} childVNodes VNodes of children
+ *
+ *         If the node is a text node, this will be a `Text` element
+ * @property {VNode[]} childVNodes Virtual nodes of the children of this node.
+ *
+ *         This is obtained by recursively rendering the `children` of the node.
  */
 
 /**
