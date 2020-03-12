@@ -90,7 +90,7 @@ function useState(init) {
 /**
  * useEffect hook
  * @param {()=>void|VoidFunction} callback effect
- * @param {any[]} args dependecy array of the effect
+ * @param {any[]} [args] dependecy array of the effect
  */
 async function useEffect(callback, args) {
   /**
@@ -98,7 +98,7 @@ async function useEffect(callback, args) {
    */
   const [hookState] = getHook();
 
-  if (hasChanged(hookState.args, args)) {
+  if (hasArgsChanged(hookState.args, args)) {
     // Run cleanup for previous effect
     invokeEffectCleanup(hookState);
     // update hookState
@@ -114,12 +114,19 @@ async function useEffect(callback, args) {
 }
 
 /**
- * Check if useEffect arguments has changed
- * @param {any[]|undefined} prevArgs
- * @param {any[]} args
+ * Check if any of `useEffect` dependencies has changed
+ * @param {any[]|undefined} prevArgs previous dependencies of the hook
+ * @param {any[]} args current dependencies of the hook
  */
-function hasChanged(prevArgs, args) {
-  return !prevArgs || prevArgs.some((prevArg, i) => prevArg !== args[i]);
+function hasArgsChanged(prevArgs, args) {
+  if (!prevArgs) {
+    // 1. When the effect is initializing prevArgs will be undefined
+    // 2. If the effect does not have any dependencies declared, prevArgs will be undefined
+    // In both cases effect should run
+    return true;
+  }
+  // Check if any of the items in the dependencies array has changed
+  return prevArgs.some((prevArg, i) => prevArg !== args[i]);
 }
 
 /**
