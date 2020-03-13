@@ -16,7 +16,7 @@ import { renderComponent } from "./component.js";
  * @param {number} [position] the position of node in the parent
  * @returns {VNode}
  */
-export function render(vnode, domElement, prevVNode = {}, position) {
+function render(vnode, domElement, prevVNode = {}, position) {
   // If position is not defined,
   // new elements will be added to the end of the DOM element
 
@@ -63,3 +63,5 @@ export function render(vnode, domElement, prevVNode = {}, position) {
 
   return Object.assign(prevVNode, vnode);
 }
+
+export { render };
