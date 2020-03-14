@@ -6,18 +6,27 @@ function Counter() {
 
   // Effects
   useEffect(() => {
-    const id = setTimeout(() => {
-      setState(count => count + 1);
-    }, 1500);
+    console.log("Parent mounted");
     return () => {
-      clearTimeout(id);
+      console.log("Parent unmounted");
     };
   }, []);
 
   return h(
     "div",
-    // props can be null
-    null,
+    // Props
+    { className: "parent" },
+    // Children
+    // can be a string
+    "Parent Component",
+    // or another node
+    h(
+      "div",
+      // props can be null
+      null,
+      "State : ",
+      count
+    ),
     h(
       "button",
       {
@@ -27,60 +36,52 @@ function Counter() {
         },
         name: "button"
       },
-      count
+      "Update parent"
     ),
     // passing children to components
-    h(Clock, {}, "QWERTY")
+    h(Child, null, count)
   );
 }
 
-function Clock({ children }) {
-  const [currentTime, setState] = useState(Date.now);
-
-  // multiple effect hooks
-  useEffect(() => {
-    const id = setInterval(() => {
-      setState(Date.now());
-    }, 1000);
-
-    return () => {
-      clearInterval(id);
-    };
-  }, []);
+function Child({ children }) {
+  const [count, setState] = useState(0);
 
   useEffect(() => {
-    console.log("Mounted");
+    console.log("Child mounted");
     return () => {
-      console.log("Unmounted");
+      console.log("Child unmounted");
     };
   }, []);
 
   return h(
     "div",
-    null,
-    new Date(currentTime).toTimeString(),
-    // rendering an array
-    children
+    { className: "child" },
+    "Child Component",
+    h("div", null, "State : ", count),
+    h("div", null, "Props : ", children),
+    h(
+      "button",
+      {
+        // event listener
+        onClick: () => {
+          setState(x => x + 1);
+        },
+        name: "button"
+      },
+      "Update child"
+    )
   );
 }
 
 // Attach to window object for inspection
-window.vnode = render(
-  h(
-    "div",
-    { className: "wrapper" },
-    // a string as child
-    "A string",
-    // another component as child
-    h(Counter)
-  ),
-  document.getElementById("app")
-);
+window.vnode = render(h(Counter), document.getElementById("app"));
+
+window.h = h;
 
 window.render = render;
 
 window.unmount = unmount;
 
 console.log(
-  "vnode, render and unmount are attached to window.\nAccess them as window.vnode,window.render,etc"
+  "vnode, render, h and unmount are attached to window.\nAccess them as window.vnode,window.render,etc"
 );
