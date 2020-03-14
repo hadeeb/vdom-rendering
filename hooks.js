@@ -117,15 +117,15 @@ async function useEffect(callback, args) {
 }
 
 /**
- * Check if any of `useEffect` dependencies has changed
+ * Check if any of the dependencies of a hook has changed
  * @param {any[]|undefined} prevArgs previous dependencies of the hook
  * @param {any[]} args current dependencies of the hook
  */
 function hasArgsChanged(prevArgs, args) {
   if (!prevArgs) {
-    // 1. When the effect is initializing prevArgs will be undefined
-    // 2. If the effect does not have any dependencies declared, prevArgs will be undefined
-    // In both cases effect should run
+    // 1. When the hook is initializing prevArgs will be undefined
+    // 2. If the hook does not have any dependencies declared, prevArgs will be undefined
+    // In both cases hook should run
     return true;
   }
   // Check if any of the items in the dependencies array has changed
@@ -180,4 +180,48 @@ function useRef(initialValue) {
   return hookState;
 }
 
-export { useReducer, useState, useEffect, useRef, invokeEffectCleanup };
+/**
+ * @typedef MemoHook
+ * @type {object}
+ * @property {any[]} args dependecy array of the hook
+ * @property {T} value value
+ * @template T
+ */
+
+/**
+ * useMemo hook
+ * @param {()=>T} callback effect
+ * @param {any[]} [args] dependecy array of the effect
+ * @template T
+ */
+function useMemo(callback, args) {
+  /**
+   * @type {[MemoHook<T>]}
+   */
+  const [hookState] = getHook();
+  if (hasArgsChanged(hookState.args, args)) {
+    hookState.args = args;
+    hookState.value = callback();
+  }
+  return hookState.value;
+}
+
+/**
+ * useCallback hook
+ * @param {T} callback effect
+ * @param {any[]} [args] dependecy array of the effect
+ * @template T
+ */
+function useCallback(callback, args) {
+  return useMemo(() => callback, args);
+}
+
+export {
+  useReducer,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+  invokeEffectCleanup
+};
