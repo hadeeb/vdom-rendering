@@ -12,7 +12,7 @@ import { TEXT_NODE, h } from "./createElement.js";
  * @returns {VNode}
  */
 function ensureVNode(vnode) {
-  vnode = vnode != null ? vnode : "";
+  vnode = vnode ?? "";
   if (typeof vnode !== "object") {
     vnode = h(TEXT_NODE, vnode);
   }

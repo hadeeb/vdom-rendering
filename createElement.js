@@ -70,8 +70,8 @@ const TEXT_NODE = Symbol("TextNode");
 function h(type, props, ...children) {
   return {
     type,
-    props: props != null ? props : {},
-    key: props != null ? props.key : null,
+    props: props ?? {},
+    key: props?.key,
     children
   };
 }

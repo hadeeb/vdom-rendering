@@ -16,7 +16,7 @@ function diffProps(vnode, prevVNode) {
   // When a node is rendering for the first time,
   // prevVNode will be an empty object({}). (See render.js L#19)
   // In those cases, prevVNode.props will be undefined, so use an empty object
-  const prevProps = prevVNode.props != null ? prevVNode.props : {};
+  const prevProps = prevVNode.props ?? {};
   const newProps = vnode.props;
 
   if (newProps !== prevProps) {
