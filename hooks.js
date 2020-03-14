@@ -32,14 +32,17 @@ function useReducer(reducer, init) {
       state: typeof init === "function" ? init() : init,
       // Update function aka `dispatch`
       dispatch: action => {
-        // Calculate new state
-        const newValue = reducer(hookState.state, action);
-        if (newValue !== hookState.state) {
-          // Update state if it has changed
-          hookState.state = newValue;
-          if (currentComponent.dom) {
-            // This check is to ensure vnode is still mounted
-            // See utils.js -> unmountComponent
+        if (currentComponent.hooks) {
+          // This check is to ensure vnode is still mounted
+          // See utils.js -> unmountComponent
+
+          // Calculate new state
+          const newValue = reducer(hookState.state, action);
+
+          if (newValue !== hookState.state) {
+            // Update state if it has changed
+            hookState.state = newValue;
+
             // Re-render the component
             renderComponent(
               currentComponent,

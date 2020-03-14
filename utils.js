@@ -25,41 +25,36 @@ function ensureVNode(vnode) {
  * @param {VNode} vnode
  */
 function unmount(vnode) {
-  // Remove the DOM element
-  vnode.dom.remove();
-
-  /**
-   * @type {VNode[]}
-   */
-  const childNodes = isComponent(vnode)
-    ? // For a component, it's vnode is in childVNodes
-      // see component.js L#44
-      vnode.childVNodes.childVNodes
-    : vnode.childVNodes;
-
-  // Recursively unmount each child node
-  childNodes.forEach(unmount);
-
   if (isComponent(vnode)) {
     // If it is a component, execute effect cleanups
     unmountComponent(vnode);
+  } else {
+    // Remove the DOM element
+    vnode.dom.remove();
+
+    // Recursively unmount each child node
+    vnode.childVNodes.forEach(unmount);
   }
 }
 
 /**
- * Execute effect cleanups of the component
+ * Execute effect cleanups of the component and remove it's child nodes
  * @param {VNode} vnode
  */
 async function unmountComponent(vnode) {
-  // Reset dom to denote vnode is unmounted
+  const hooks = vnode.hooks;
+  // Reset `hooks` key to denote vnode is unmounted
   // This is to prevent updating unmounted components
-  // see hooks.js L#40
-  vnode.dom = null;
-  // Invoke unmount effects
+  // see hooks.js L#35
+  vnode.hooks = null;
 
+  // Unmount the child nodes
+  unmount(vnode.rootVNode);
+
+  // Invoke unmount effects
   // defer the execution
   await Promise.resolve();
-  vnode.hooks.forEach(invokeEffectCleanup);
+  hooks.forEach(invokeEffectCleanup);
 }
 
 /**

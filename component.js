@@ -24,13 +24,19 @@ let hookIndex = 0;
  * @param {number} position position of node in the parent
  */
 function renderComponent(vnode, domElement, prevVNode, position) {
-  // Copy previous hooks
-  if (prevVNode.hooks) {
-    vnode.hooks = prevVNode.hooks;
-  }
+  // If there are no hooks, initialize an array
+  prevVNode.hooks = prevVNode.hooks != null ? prevVNode.hooks : [];
 
   // Store current component, so hooks can read data from component
-  currentComponent = vnode;
+  currentComponent = prevVNode;
+  //
+  // Note: why currentComponent is set as prevVNode?
+  //
+  // * This function always return the reference to prevVNode, see return statement
+  //    at the end of this function.
+  // * This is to ensure that the reference to a vnode stays the same.
+  // * The values are updated by merging the new node to prevVNode, see
+  //    return statement at the end of this function.
 
   // Reset hookIndex
   hookIndex = 0;
@@ -39,20 +45,18 @@ function renderComponent(vnode, domElement, prevVNode, position) {
   const props = { children: vnode.children, ...vnode.props };
 
   // Call the component function with props to get the node tree
-  const rootVNode = vnode.type(props);
+  /**
+   * @type {VNode}
+   */
+  // TODO: better name
+  const childNode = vnode.type(props);
 
-  // A components `children` are handled by the component,
-  // So, reusing `childVNodes` key to store VNode obtained by
-  // rendering the component.
-  vnode.childVNodes = render(
-    rootVNode,
+  vnode.rootVNode = render(
+    childNode,
     domElement,
-    prevVNode.childVNodes,
+    prevVNode.rootVNode,
     position
   );
-
-  // Save the dom
-  vnode.dom = vnode.childVNodes.dom;
 
   return Object.assign(prevVNode, vnode);
 }

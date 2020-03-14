@@ -2,6 +2,7 @@
  * Virtual node
  * @typedef VNode
  * @type {object}
+ *
  * @property {string|function} type Type of node.
  *
  *        It will be a string for DOM elements like `div`,`button`,etc.
@@ -9,25 +10,35 @@
  *        For conponents, it will the component function.
  *
  *        For text nodes, it will be TEXT_NODE
+ *
  * @property {any} props Properties of the node
  *
  *        eg: `id` of the `div` element, `initialCount` of the `Counter` component, etc.
+ *
  * @property {string|number|symbol|undefined} key It is used to uniquely
  *        identify a node in an array of nodes.
  *
  *        TODO: Add link to keyed update
+ *
  * @property {VNode[]} children Children of the node aka the content of the node.
  *
  *        eg: the text inside a `button`
- * @property {any[]} hooks Component hooks
  *
- *        For component nodes, it's states & effects are stored here.
- * @property {HTMLElement|null} dom DOM element to which VNode is attached
+ * @property {HTMLElement|undefined} dom DOM element to which VNode is attached
  *
  *         If the node is a text node, this will be a `Text` element
- * @property {VNode[]} childVNodes Virtual nodes of the children of this node.
+ *
+ * @property {VNode[]|undefined} childVNodes Virtual nodes of the children of this node.
  *
  *         This is obtained by recursively rendering the `children` of the node.
+ *
+ * @property {VNode|undefined} rootVNode Virtual node returned from a component.
+ *
+ *         This is obtained by rendering the output of the component function.
+ *
+ * @property {any[]|undefined} hooks Component hooks
+ *
+ *        For component nodes, it's states & effects are stored here.
  */
 
 /**
@@ -40,7 +51,7 @@ const TEXT_NODE = Symbol("TextNode");
  * @type {object}
  * @property {typeof TEXT_NODE} type
  * @property {string|number} props
- * @property {Text|null} dom
+ * @property {Text|undefined} dom
  */
 
 /**
@@ -61,10 +72,7 @@ function h(type, props, ...children) {
     type,
     props: props != null ? props : {},
     key: props != null ? props.key : null,
-    children,
-    hooks: [],
-    childVNodes: [],
-    dom: null
+    children
   };
 }
 

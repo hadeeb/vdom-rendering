@@ -36,23 +36,18 @@ function render(vnode, domElement, prevVNode = {}, position) {
   }
 
   // DOM elements
+
+  // Create DOM nodes
   if (prevVNode.dom) {
     // Use previous DOM node
     vnode.dom = prevVNode.dom;
   } else {
     // Create DOM node
     vnode.dom = isTextNode(vnode)
-      ? // For text nodes props contains the text content
+      ? // In text nodes, props contains the text content
         // see utils.js L#17
         document.createTextNode(vnode.props)
       : document.createElement(vnode.type);
-  }
-
-  if (!prevVNode.dom || position != null) {
-    // DOM is not inserted
-    // OR
-    // position has changed
-    domElement.insertBefore(vnode.dom, domElement.childNodes[position + 1]);
   }
 
   // Diff props
@@ -60,6 +55,13 @@ function render(vnode, domElement, prevVNode = {}, position) {
 
   // Render children
   renderChildren(vnode, prevVNode);
+
+  if (!prevVNode.dom || position != null) {
+    // DOM is not inserted
+    // OR
+    // position has changed
+    domElement.insertBefore(vnode.dom, domElement.childNodes[position + 1]);
+  }
 
   return Object.assign(prevVNode, vnode);
 }
