@@ -39,7 +39,10 @@ function Counter() {
       "Update parent"
     ),
     // passing children to components
-    h(Child, null, count)
+    // Keyed children
+    // Swap position on each update to count
+    h(Child, { key: count % 2 }, count),
+    h(Child, { key: (count + 1) % 2 }, count)
   );
 }
 
