@@ -134,10 +134,7 @@ function hasArgsChanged(prevArgs, args) {
 async function invokeEffect(hook) {
   // Defer the effect execution
   await Promise.resolve();
-  const cleanup = hook.value();
-  if (typeof cleanup === "function") {
-    hook.cleanup = cleanup;
-  }
+  hook.cleanup = hook.value();
 }
 
 /**
@@ -145,8 +142,7 @@ async function invokeEffect(hook) {
  * @param {EffectHook} hook
  */
 function invokeEffectCleanup(hook) {
-  if (hook.cleanup) {
-    // This is a useEffect hook
+  if (typeof hook.cleanup === "function") {
     hook.cleanup();
   }
 }
