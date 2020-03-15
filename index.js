@@ -9,9 +9,11 @@ import {
   useCallback
 } from "./hooks.js";
 import { unmount } from "./utils.js";
+import { Fragment } from "./fragment.js";
 
 export {
   h,
+  Fragment,
   render,
   useEffect,
   useReducer,
@@ -22,4 +24,4 @@ export {
   unmount
 };
 
-export default { createElement: h };
+export default { createElement: h, Fragment };

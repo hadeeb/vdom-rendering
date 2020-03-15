@@ -58,6 +58,9 @@ function renderComponent(vnode, domElement, prevVNode, position) {
     position
   );
 
+  // Assign parent DOM to vnode
+  vnode.dom = domElement;
+
   return Object.assign(prevVNode, vnode);
 }
 
@@ -66,10 +69,6 @@ function renderComponent(vnode, domElement, prevVNode, position) {
  * @returns{[any,VNode]}
  */
 function getHook() {
-  if (!currentComponent) {
-    throw new Error("Hook called outside component");
-  }
-
   // hookIndex is incremented after each access
   const index = hookIndex++;
   // when another component starts rendering hookIndex will be reset to 0

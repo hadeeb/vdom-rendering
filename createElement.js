@@ -26,7 +26,9 @@
  *
  * @property {HTMLElement|undefined} dom DOM element to which VNode is attached
  *
- *         If the node is a text node, this will be a `Text` element
+ *        If the node is a text node, this will be a `Text` element
+ *
+ *        If the node is a component, it will be the parent DOM element
  *
  * @property {VNode[]|undefined} childVNodes Virtual nodes of the children of this node.
  *

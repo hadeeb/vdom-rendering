@@ -5,6 +5,7 @@
 
 import { invokeEffectCleanup } from "./hooks.js";
 import { TEXT_NODE, h } from "./createElement.js";
+import { isFragment } from "./fragment.js";
 
 /**
  * Converts string/number/null values to VNode
@@ -25,15 +26,19 @@ function ensureVNode(vnode) {
  * @param {VNode} vnode
  */
 function unmount(vnode) {
-  if (isComponent(vnode)) {
+  if (isFragment(vnode)) {
+    // Fragments only have child nodes
+    // Recursively unmount them
+    vnode.childVNodes.forEach(unmount);
+  } else if (isComponent(vnode)) {
     // If it is a component, execute effect cleanups
     unmountComponent(vnode);
   } else {
-    // Remove the DOM element
-    vnode.dom.remove();
-
     // Recursively unmount each child node
     vnode.childVNodes.forEach(unmount);
+
+    // Remove the DOM element
+    vnode.dom.remove();
   }
 }
 
@@ -42,19 +47,13 @@ function unmount(vnode) {
  * @param {VNode} vnode
  */
 async function unmountComponent(vnode) {
-  const hooks = vnode.hooks;
-  // Reset `hooks` key to denote vnode is unmounted
-  // This is to prevent updating unmounted components
-  // see hooks.js L#35
-  vnode.hooks = null;
-
   // Unmount the child nodes
   unmount(vnode.rootVNode);
 
   // Invoke unmount effects
   // defer the execution
   await Promise.resolve();
-  hooks.forEach(invokeEffectCleanup);
+  vnode.hooks.forEach(invokeEffectCleanup);
 }
 
 /**

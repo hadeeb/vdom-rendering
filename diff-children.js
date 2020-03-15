@@ -8,30 +8,38 @@ import { ensureVNode, unmount } from "./utils.js";
 
 /**
  * Loop through child nodes of a node and render them
- * @param {VNode} vnode
- * @param {VNode} prevVNode
+ * @param {VNode[]} children child nodes
+ * @param {HTMLElement} domElement DOM element to attach the child nodes
+ * @param {VNode[]} [prevChildNodes] virtual nodes from previous render
+ * @param {number} [position] position of the children in parent node
  */
-function renderChildren(vnode, prevVNode) {
-  const prevChildNodes = prevVNode.childVNodes || [];
+function renderChildren(children, domElement, prevChildNodes = [], position) {
+  // If there are any changes in position of the parent,
+  // `position` parameter will be a number, see L#38
+  const hasParentPositionChanged = position != null;
 
-  /**
-   * child nodes of the node
-   * @type {VNode[]}
-   */
-  // children may contain arrays, so it is flattened
+  // Use 0 as default value
+  position = position != null ? position : 0;
+
+  // children may contain arrays, so flatten it.
   // TODO: add an example
-  const children = vnode.children.flat();
+  children = children.flat();
 
-  vnode.childVNodes = children.map((child, index) => {
+  const childVNodes = children.map((child, index) => {
     child = ensureVNode(child);
+
+    let childIndex = position + index;
     // Find previous node corresponding to this child node
     // TODO: add more info about keyed updates
     const prevChildVNode = prevChildNodes.find((node, i) => {
       if (node) {
         if (node.type === child.type && child.key === node.key) {
-          if (i === index) {
-            // No change in position => Don't pass position
-            index = null;
+          if (i === index && !hasParentPositionChanged) {
+            // No change in position here
+            // and there is no change in position in parent, see L#17
+            // So, don't pass position.
+            // This helps to avoid a DOM operation, see dom.js L#21
+            childIndex = null;
           }
           // remove prevVNode so it won't match with any other vnode
           // also all elements remaining in this array will be removed from DOM
@@ -42,7 +50,7 @@ function renderChildren(vnode, prevVNode) {
       return false;
     });
 
-    return render(child, vnode.dom, prevChildVNode, index);
+    return render(child, domElement, prevChildVNode, childIndex);
   });
 
   prevChildNodes.forEach(node => {
@@ -51,6 +59,8 @@ function renderChildren(vnode, prevVNode) {
       unmount(node);
     }
   });
+
+  return childVNodes;
 }
 
 export { renderChildren };
