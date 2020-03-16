@@ -38,7 +38,7 @@ function renderChildren(children, domElement, prevChildNodes = [], position) {
             // No change in position here
             // and there is no change in position in parent, see L#17
             // So, don't pass position.
-            // This helps to avoid a DOM operation, see dom.js L#21
+            // This helps to avoid a DOM operation, see dom.js L#27
             childIndex = null;
           }
           // remove prevVNode so it won't match with any other vnode

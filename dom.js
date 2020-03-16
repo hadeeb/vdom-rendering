@@ -18,10 +18,16 @@ function addToDOM(vnode, domElement, prevVNode, position) {
 
   const dom = createDOMElement(vnode, prevVNode);
 
-  if (dom !== prevVNode.dom || position != null) {
-    // the DOM element is newly created
+  if (prevVNode.dom && dom !== prevVNode.dom) {
+    // not initial render and DOM element has changed,
+    // Replace with new DOM element
+    prevVNode.dom.replaceWith(dom);
+  }
+
+  if (!prevVNode.dom || position != null) {
+    // Initial render
     // OR
-    // position has changed
+    // position has changed, see diff-children.js L#41
     domElement.insertBefore(dom, domElement.childNodes[position + 1]);
   }
 
@@ -41,14 +47,6 @@ function createDOMElement(vnode, prevVNode) {
     // use the previous DOM element
     return prevVNode.dom;
   } else {
-    if (prevVNode.dom) {
-      // During initial render, prevVNode.dom will be undefined
-      // So, this condition will be false
-
-      // Remove the previous DOM element
-      prevVNode.dom.remove();
-    }
-
     // Create DOM node
     return isTextNode(vnode)
       ? // In text nodes, props contains the text content
