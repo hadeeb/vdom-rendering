@@ -8,7 +8,6 @@ import { diffProps } from "./diff-props.js";
 import { renderChildren } from "./diff-children.js";
 import { renderComponent } from "./component.js";
 import { addToDOM } from "./dom.js";
-import { isFragment, renderFragment } from "./fragment.js";
 
 /**
  * Render a virtual node to DOM
@@ -22,11 +21,6 @@ function render(vnode, domElement, prevVNode = {}, position) {
   // If vnode is a string/number/null,
   // convert it into a vnode
   vnode = ensureVNode(vnode);
-
-  // Fragment
-  if (isFragment(vnode)) {
-    return renderFragment(vnode, domElement, prevVNode, position);
-  }
 
   // Component
   if (isComponent(vnode)) {

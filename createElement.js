@@ -24,21 +24,21 @@
  *
  *        eg: the text inside a `button`
  *
- * @property {HTMLElement|undefined} dom DOM element to which VNode is attached
+ * @property {HTMLElement} [dom] DOM element to which VNode is attached
  *
  *        If the node is a text node, this will be a `Text` element
  *
  *        If the node is a component, it will be the parent DOM element
  *
- * @property {VNode[]|undefined} childVNodes Virtual nodes of the children of this node.
+ * @property {VNode[]} [childVNodes] Virtual nodes of the children of this node.
  *
  *         This is obtained by recursively rendering the `children` of the node.
  *
- * @property {VNode|undefined} rootVNode Virtual node returned from a component.
+ * @property {VNode} [rootVNode] Virtual node returned from a component.
  *
  *         This is obtained by rendering the output of the component function.
  *
- * @property {any[]|undefined} hooks Component hooks
+ * @property {any[]} [hooks] Component hooks
  *
  *        For component nodes, it's states & effects are stored here.
  */

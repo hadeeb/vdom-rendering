@@ -5,7 +5,6 @@
 
 import { invokeEffectCleanup } from "./hooks.js";
 import { TEXT_NODE, h } from "./createElement.js";
-import { isFragment } from "./fragment.js";
 
 /**
  * Converts string/number/null values to VNode
@@ -26,11 +25,7 @@ function ensureVNode(vnode) {
  * @param {VNode} vnode
  */
 function unmount(vnode) {
-  if (isFragment(vnode)) {
-    // Fragments only have child nodes
-    // Recursively unmount them
-    vnode.childVNodes.forEach(unmount);
-  } else if (isComponent(vnode)) {
+  if (isComponent(vnode)) {
     // If it is a component, execute effect cleanups
     unmountComponent(vnode);
   } else {
