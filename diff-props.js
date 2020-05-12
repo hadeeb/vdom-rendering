@@ -28,12 +28,17 @@ function diffProps(vnode, prevVNode) {
       domElement.data = newProps;
     } else {
       // Iterate through props
-      Object.keys(newProps).forEach(key => {
+      Object.keys(newProps).forEach((key) => {
         const newPropValue = newProps[key];
         const prevPropValue = prevProps[key];
 
         if (newPropValue !== prevPropValue) {
-          if (key.startsWith("on")) {
+          if (key === "key") {
+            // Do nothing
+          } else if (key === "ref") {
+            // Assign dom element to the ref
+            newPropValue.current = domElement;
+          } else if (key.startsWith("on")) {
             // Events
             // Converting key to lowercase to support both
             // `onclick` and `onClick`

@@ -21,7 +21,7 @@ let hookIndex = 0;
  * @param {VNode} vnode virtual node to render
  * @param {HTMLElement} domElement DOM element to attach the node
  * @param {VNode} prevVNode previous virtual node
- * @param {number} position position of node in the parent
+ * @param {number} [position] position of node in the parent
  */
 function renderComponent(vnode, domElement, prevVNode, position) {
   // If there are no hooks, initialize an array

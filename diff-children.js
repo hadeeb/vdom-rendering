@@ -19,11 +19,11 @@ function renderChildren(children, domElement, prevChildNodes = [], position) {
   const hasParentPositionChanged = position != null;
 
   // Use 0 as default value
-  position = position != null ? position : 0;
+  position = hasParentPositionChanged ? position : 0;
 
   // children may contain arrays, so flatten it.
   // TODO: add an example
-  children = children.flat();
+  children = children.flat(Infinity);
 
   const childVNodes = children.map((child, index) => {
     child = ensureVNode(child);
@@ -53,7 +53,7 @@ function renderChildren(children, domElement, prevChildNodes = [], position) {
     return render(child, domElement, prevChildVNode, childIndex);
   });
 
-  prevChildNodes.forEach(node => {
+  prevChildNodes.forEach((node) => {
     // All reused vnodes are removed from this array, remove the rest from DOM
     if (node) {
       unmount(node);

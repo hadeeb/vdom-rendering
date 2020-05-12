@@ -32,9 +32,9 @@ function Counter() {
       {
         // event listener
         onClick: () => {
-          setState(x => x + 1);
+          setState((x) => x + 1);
         },
-        name: "button"
+        name: "button",
       },
       "Update parent"
     ),
@@ -67,9 +67,9 @@ function Child({ children }) {
       {
         // event listener
         onClick: () => {
-          setState(x => x + 1);
+          setState((x) => x + 1);
         },
-        name: "button"
+        name: "button",
       },
       "Update child"
     )

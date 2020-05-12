@@ -12,7 +12,7 @@ import { TEXT_NODE, h } from "./createElement.js";
  * @returns {VNode}
  */
 function ensureVNode(vnode) {
-  vnode = vnode != null ? vnode : "";
+  vnode = vnode != null && typeof vnode !== "boolean" ? vnode : "";
   if (typeof vnode !== "object") {
     vnode = h(TEXT_NODE, vnode);
   }
@@ -25,30 +25,28 @@ function ensureVNode(vnode) {
  * @param {VNode} vnode
  */
 function unmount(vnode) {
-  if (isComponent(vnode)) {
-    // If it is a component, execute effect cleanups
-    unmountComponent(vnode);
-  } else {
-    // Recursively unmount each child node
-    vnode.childVNodes.forEach(unmount);
+  const domElement = isComponent(vnode) ? vnode.rootVNode.dom : vnode.dom;
+  domElement.remove();
 
-    // Remove the DOM element
-    vnode.dom.remove();
-  }
+  // defer the execution
+  microTask(() => {
+    cleanup(vnode);
+  });
 }
 
 /**
- * Execute effect cleanups of the component and remove it's child nodes
+ * Execute effect cleanups of the component and it's child components
  * @param {VNode} vnode
  */
-async function unmountComponent(vnode) {
-  // Unmount the child nodes
-  unmount(vnode.rootVNode);
-
-  // Invoke unmount effects
-  // defer the execution
-  await Promise.resolve();
-  vnode.hooks.forEach(invokeEffectCleanup);
+function cleanup(vnode) {
+  if (isComponent(vnode)) {
+    cleanup(vnode.rootVNode);
+    // Invoke unmount effects
+    vnode.hooks.forEach(invokeEffectCleanup);
+  } else {
+    // Recursively run cleanup for each child node
+    vnode.childVNodes.forEach(cleanup);
+  }
 }
 
 /**
@@ -76,4 +74,19 @@ function eventProxy(e) {
   this.vnodeListeners[e.type](e);
 }
 
-export { isComponent, isTextNode, ensureVNode, unmount, eventProxy };
+const microTask = queueMicrotask;
+
+/**
+ * @type {typeof microTask}
+ */
+const macroTask = setTimeout;
+
+export {
+  isComponent,
+  isTextNode,
+  ensureVNode,
+  unmount,
+  eventProxy,
+  microTask,
+  macroTask,
+};

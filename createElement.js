@@ -74,7 +74,7 @@ function h(type, props, ...children) {
     type,
     props: props != null ? props : {},
     key: props != null ? props.key : null,
-    children
+    children,
   };
 }
 

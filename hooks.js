@@ -4,12 +4,15 @@
  */
 
 import { getHook, renderComponent } from "./component.js";
+import { microTask, macroTask } from "./utils.js";
 
 /**
  * @typedef StateHook
  * @type {object}
  * @property {any} state
  * @property {(action:any)=>void} dispatch
+ * @property {(prevState:State,action:Action)=>State} reducer
+ * @template State,Action
  */
 
 /**
@@ -21,9 +24,11 @@ import { getHook, renderComponent } from "./component.js";
  */
 function useReducer(reducer, init) {
   /**
-   * @type {[StateHook,VNode]}
+   * @type {[StateHook<State,Action>,VNode]}
    */
   const [hookState, currentComponent] = getHook();
+
+  hookState.reducer = reducer;
 
   if (!hookState.dispatch) {
     // Initialize hook
@@ -31,9 +36,9 @@ function useReducer(reducer, init) {
       // State
       state: typeof init === "function" ? init() : init,
       // Update function aka `dispatch`
-      dispatch: action => {
+      dispatch: (action) => {
         // Calculate new state
-        const newValue = reducer(hookState.state, action);
+        const newValue = hookState.reducer(hookState.state, action);
 
         if (newValue !== hookState.state) {
           // Update state if it has changed
@@ -46,7 +51,7 @@ function useReducer(reducer, init) {
             currentComponent
           );
         }
-      }
+      },
     });
   }
 
@@ -59,7 +64,7 @@ function useReducer(reducer, init) {
  * @param {T|((prev:T)=>T)} newStateOrCallback
  * @template T
  */
-function reducerForuseState(prevState, newStateOrCallback) {
+function reducerForUseState(prevState, newStateOrCallback) {
   return typeof newStateOrCallback === "function"
     ? newStateOrCallback(prevState)
     : newStateOrCallback;
@@ -74,7 +79,7 @@ function reducerForuseState(prevState, newStateOrCallback) {
  * @template T
  */
 function useState(init) {
-  return useReducer(reducerForuseState, init);
+  return useReducer(reducerForUseState, init);
 }
 
 /**
@@ -82,7 +87,7 @@ function useState(init) {
  * @type {object}
  * @property {any[]} args dependecy array of the effect
  * @property {()=>void|VoidFunction} value effect function
- * @property {VoidFunction|null} cleanup effect cleanup function, returned from effect fuction
+ * @property {VoidFunction|void} cleanup effect cleanup function, returned from effect fuction
  */
 
 /**
@@ -91,8 +96,27 @@ function useState(init) {
  * @param {any[]} [args] dependecy array of the effect
  */
 async function useEffect(callback, args) {
+  effectHook(callback, args, macroTask);
+}
+
+/**
+ * useLayoutEffect hook
+ * @param {()=>void|VoidFunction} callback effect
+ * @param {any[]} [args] dependecy array of the effect
+ */
+async function useLayoutEffect(callback, args) {
+  effectHook(callback, args, microTask);
+}
+
+/**
+ * Effect hook
+ * @param {()=>void|VoidFunction} callback effect
+ * @param {any[]} [args] dependecy array of the effect
+ * @param {(callback: () => void) => void} delayFn when to execute the effect
+ */
+function effectHook(callback, args, delayFn) {
   /**
-   * @type {[EffectHook]}
+   * @type {[EffectHook,VNode]}
    */
   const [hookState] = getHook();
 
@@ -103,11 +127,11 @@ async function useEffect(callback, args) {
     Object.assign(hookState, {
       args,
       value: callback,
-      cleanup: null
+      cleanup: null,
     });
 
     // Invoke the new effect
-    invokeEffect(hookState);
+    invokeEffect(hookState, delayFn);
   }
 }
 
@@ -130,11 +154,13 @@ function hasArgsChanged(prevArgs, args) {
 /**
  * Run an effect
  * @param {EffectHook} hook
+ * @param {(callback: () => void) => void} delayFn
  */
-async function invokeEffect(hook) {
+async function invokeEffect(hook, delayFn) {
   // Defer the effect execution
-  await Promise.resolve();
-  hook.cleanup = hook.value();
+  delayFn(() => {
+    hook.cleanup = hook.value();
+  });
 }
 
 /**
@@ -161,11 +187,12 @@ function invokeEffectCleanup(hook) {
  */
 function useRef(initialValue) {
   /**
-   * @type {[RefHook]}
+   * @type {[RefHook,VNode]}
    */
   const [hookState] = getHook();
   if (!("current" in hookState)) {
     // Initialize hook
+    // @ts-ignore
     hookState.current = initialValue;
   }
   return hookState;
@@ -187,7 +214,7 @@ function useRef(initialValue) {
  */
 function useMemo(callback, args) {
   /**
-   * @type {[MemoHook<T>]}
+   * @type {[MemoHook<T>,VNode]}
    */
   const [hookState] = getHook();
   if (hasArgsChanged(hookState.args, args)) {
@@ -211,8 +238,9 @@ export {
   useReducer,
   useState,
   useEffect,
+  useLayoutEffect,
   useRef,
   useMemo,
   useCallback,
-  invokeEffectCleanup
+  invokeEffectCleanup,
 };
