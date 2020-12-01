@@ -1,4 +1,6 @@
+import htm from "https://unpkg.com/htm@3.0.4?module";
 import { h, render, useEffect, useState, unmount } from "./index.js";
+const html = htm.bind(h);
 
 function Counter() {
   // component state
@@ -12,38 +14,19 @@ function Counter() {
     };
   }, []);
 
-  return h(
-    "div",
-    // Props
-    { className: "parent" },
-    // Children
-    // can be a string
-    "Parent Component",
-    // or another node
-    h(
-      "div",
-      // props can be null
-      null,
-      "State : ",
-      count
-    ),
-    h(
-      "button",
-      {
-        // event listener
-        onClick: () => {
-          setState((x) => x + 1);
-        },
-        name: "button",
-      },
-      "Update parent"
-    ),
-    // passing children to components
-    // Keyed children
-    // Swap position on each update to count
-    h(Child, { key: count % 2 }, count),
-    h(Child, { key: (count + 1) % 2 }, count)
-  );
+  return html`<div className="parent">
+    Parent Component
+    <div>State : ${count}</div>
+    <button
+      onClick=${() => {
+        setState((x) => x + 1);
+      }}
+    >
+      Update parent
+    </button>
+    <${Child} key=${count % 2}>${count}</${Child}>
+    <${Child} key=${(count + 1) % 2}>${count}</${Child}>
+  </div>`;
 }
 
 function Child({ children }) {
@@ -56,28 +39,23 @@ function Child({ children }) {
     };
   }, []);
 
-  return h(
-    "div",
-    { className: "child" },
-    "Child Component",
-    h("div", null, "State : ", count),
-    h("div", null, "Props : ", children),
-    h(
-      "button",
-      {
-        // event listener
-        onClick: () => {
-          setState((x) => x + 1);
-        },
-        name: "button",
-      },
-      "Update child"
-    )
-  );
+  return html`<div className="child">
+    Child Component
+    <div>State : ${count}</div>
+    <div>Props : ${children}</div>
+    <button
+      name="button"
+      onClick=${() => {
+        setState((x) => x + 1);
+      }}
+    >
+      Update child
+    </button>
+  </div>`;
 }
 
 // Attach to window object for inspection
-window.vnode = render(h(Counter), document.getElementById("app"));
+window.vnode = render(html`<${Counter} />`, document.getElementById("app"));
 
 window.h = h;
 

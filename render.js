@@ -18,6 +18,7 @@ import { addToDOM } from "./dom.js";
  * @returns {VNode}
  */
 function render(vnode, domElement, prevVNode = {}, position) {
+  if (vnode === prevVNode) return prevVNode;
   // If vnode is a string/number/null,
   // convert it into a vnode
   vnode = ensureVNode(vnode);

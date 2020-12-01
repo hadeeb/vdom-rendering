@@ -7,7 +7,7 @@
  *
  *        It will be a string for DOM elements like `div`,`button`,etc.
  *
- *        For conponents, it will the component function.
+ *        For components, it will the component function.
  *
  *        For text nodes, it will be TEXT_NODE
  *
@@ -63,7 +63,7 @@ const TEXT_NODE = Symbol("TextNode");
  *
  * <button name="button">Press me</div>
  * //will get converted to
- * h({name:"button"},"Press me")
+ * h("button", { name:"button" }, "Press me")
  * @param {string|function} type
  * @param {object} [props]
  * @param {(VNode|string|number|null)[]} children
@@ -75,6 +75,10 @@ function h(type, props, ...children) {
     props: props != null ? props : {},
     key: props != null ? props.key : null,
     children,
+    childVNodes: null,
+    rootVNode: null,
+    dom: null,
+    hooks: null,
   };
 }
 

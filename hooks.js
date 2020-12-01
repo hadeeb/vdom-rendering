@@ -95,7 +95,7 @@ function useState(init) {
  * @param {()=>void|VoidFunction} callback effect
  * @param {any[]} [args] dependecy array of the effect
  */
-async function useEffect(callback, args) {
+function useEffect(callback, args) {
   effectHook(callback, args, macroTask);
 }
 
@@ -104,7 +104,7 @@ async function useEffect(callback, args) {
  * @param {()=>void|VoidFunction} callback effect
  * @param {any[]} [args] dependecy array of the effect
  */
-async function useLayoutEffect(callback, args) {
+function useLayoutEffect(callback, args) {
   effectHook(callback, args, microTask);
 }
 
@@ -156,7 +156,7 @@ function hasArgsChanged(prevArgs, args) {
  * @param {EffectHook} hook
  * @param {(callback: () => void) => void} delayFn
  */
-async function invokeEffect(hook, delayFn) {
+function invokeEffect(hook, delayFn) {
   // Defer the effect execution
   delayFn(() => {
     hook.cleanup = hook.value();
