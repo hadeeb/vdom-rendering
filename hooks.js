@@ -176,18 +176,19 @@ function invokeEffectCleanup(hook) {
 /**
  * @typedef RefHook
  * @type {object}
- * @property {any} current value
+ * @property {T} current value
+ * @template T
  */
 
 /**
  * useRef hook
  * @param {T} initialValue
- * @returns {{current:T}}
+ * @returns {RefHook<T>}
  * @template T
  */
 function useRef(initialValue) {
   /**
-   * @type {[RefHook,VNode]}
+   * @type {[RefHook<T>,VNode]}
    */
   const [hookState] = getHook();
   if (!("current" in hookState)) {
