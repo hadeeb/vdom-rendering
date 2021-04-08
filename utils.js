@@ -20,12 +20,22 @@ function ensureVNode(vnode) {
 }
 
 /**
+ * Find the DOM element of a Vnode
+ * @param {VNode} vnode
+ * @returns {HTMLElement|Text}
+ */
+function findDOMNode(vnode) {
+  if (!isComponent(vnode)) return vnode.dom;
+  return findDOMNode(vnode.rootVNode);
+}
+
+/**
  * Remove a node's DOM element from document,
  * If it a component run all effect cleanups
  * @param {VNode} vnode
  */
 function unmount(vnode) {
-  const domElement = isComponent(vnode) ? vnode.rootVNode.dom : vnode.dom;
+  const domElement = findDOMNode(vnode);
   domElement.remove();
 
   // defer the execution
