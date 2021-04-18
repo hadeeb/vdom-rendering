@@ -10,10 +10,11 @@ import { ensureVNode, unmount } from "./utils.js";
  * Loop through child nodes of a node and render them
  * @param {VNode[]} children child nodes
  * @param {HTMLElement} domElement DOM element to attach the child nodes
- * @param {VNode[]} [prevChildNodes] virtual nodes from previous render
+ * @param {VNode[]|null} prevChildNodes virtual nodes from previous render
  * @param {number} [position] position of the children in parent node
  */
-function renderChildren(children, domElement, prevChildNodes = [], position) {
+function renderChildren(children, domElement, prevChildNodes, position) {
+  prevChildNodes = prevChildNodes ?? [];
   // If there are any changes in position of the parent,
   // `position` parameter will be a number, see L#38
   const hasParentPositionChanged = position != null;

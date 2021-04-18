@@ -8,6 +8,7 @@ import { diffProps } from "./diff-props.js";
 import { renderChildren } from "./diff-children.js";
 import { renderComponent } from "./component.js";
 import { addToDOM } from "./dom.js";
+import { h } from "./createElement.js";
 
 /**
  * Render a virtual node to DOM
@@ -17,9 +18,10 @@ import { addToDOM } from "./dom.js";
  * @param {number} [position] the position of node in the parent
  * @returns {VNode}
  */
-function render(vnode, domElement, prevVNode = {}, position) {
+function render(vnode, domElement, prevVNode, position) {
   if (vnode === prevVNode) return prevVNode;
-  // If vnode is a string/number/null,
+  prevVNode = prevVNode ?? h();
+  // If vnode is a string/number/boolean/null,
   // convert it into a vnode
   vnode = ensureVNode(vnode);
 

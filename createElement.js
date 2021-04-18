@@ -70,10 +70,11 @@ const TEXT_NODE = Symbol("TextNode");
  * @returns {VNode}
  */
 function h(type, props, ...children) {
+  props = props ?? {};
   return {
     type,
-    props: props != null ? props : {},
-    key: props != null ? props.key : null,
+    props,
+    key: props.key,
     children,
     childVNodes: null,
     rootVNode: null,

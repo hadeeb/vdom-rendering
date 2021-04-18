@@ -25,7 +25,7 @@ let hookIndex = 0;
  */
 function renderComponent(vnode, domElement, prevVNode, position) {
   // If there are no hooks, initialize an array
-  prevVNode.hooks = vnode.hooks = prevVNode.hooks || [];
+  prevVNode.hooks = vnode.hooks = prevVNode.hooks ?? [];
 
   // Store current component, so hooks can read data from component
   currentComponent = prevVNode;
