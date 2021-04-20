@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}

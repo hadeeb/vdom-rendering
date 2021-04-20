@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
@@ -39,11 +40,7 @@ function render(vnode, domElement, prevVNode, position) {
   diffProps(vnode, prevVNode);
 
   // Render children
-  vnode.childVNodes = renderChildren(
-    vnode.children,
-    vnode.dom,
-    prevVNode.childVNodes
-  );
+  vnode.childVNodes = renderChildren(vnode, prevVNode);
 
   return Object.assign(prevVNode, vnode);
 }

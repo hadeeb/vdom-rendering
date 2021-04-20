@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * Virtual node
  * @typedef VNode
@@ -20,11 +21,11 @@
  *
  *        TODO: Add link to keyed update
  *
- * @property {VNode[]} children Children of the node aka the content of the node.
+ * @property {(VNode|string|number|null)[]} children Children of the node aka the content of the node.
  *
  *        eg: the text inside a `button`
  *
- * @property {HTMLElement} [dom] DOM element to which VNode is attached
+ * @property {HTMLElement|Text} [dom] DOM element to which VNode is attached
  *
  *        If the node is a text node, this will be a `Text` element
  *
@@ -45,7 +46,9 @@
 
 /**
  * This variable is used as `type` of virtual nodes created for text content
+ * @type {string}
  */
+// @ts-ignore
 const TEXT_NODE = Symbol("TextNode");
 /**
  * Virtual node created from text contents
@@ -64,7 +67,7 @@ const TEXT_NODE = Symbol("TextNode");
  * <button name="button">Press me</div>
  * //will get converted to
  * h("button", { name:"button" }, "Press me")
- * @param {string|function} type
+ * @param {string|function} [type]
  * @param {object} [props]
  * @param {(VNode|string|number|null)[]} children
  * @returns {VNode}

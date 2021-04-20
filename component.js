@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
@@ -45,14 +46,11 @@ function renderComponent(vnode, domElement, prevVNode, position) {
   const props = { children: vnode.children, ...vnode.props };
 
   // Call the component function with props to get the node tree
-  /**
-   * @type {VNode}
-   */
-  // TODO: better name
-  const childNode = vnode.type(props);
+  /**@type {VNode}*/
+  const rootVNode = /**@type {function} */ (vnode.type)(props);
 
   vnode.rootVNode = render(
-    childNode,
+    rootVNode,
     domElement,
     prevVNode.rootVNode,
     position
