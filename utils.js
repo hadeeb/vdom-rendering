@@ -5,7 +5,7 @@
  */
 
 import { invokeEffectCleanup } from "./hooks.js";
-import { TEXT_NODE, h } from "./createElement.js";
+import { TEXT_NODE, h, IS_SVG, INHERITED_FLAGS } from "./createElement.js";
 
 /**
  * Converts string/number/null values to VNode
@@ -23,7 +23,7 @@ function ensureVNode(vnode) {
 /**
  * Find the DOM element of a Vnode
  * @param {VNode} vnode
- * @returns {HTMLElement|Text}
+ * @returns {HTMLElement|SVGElement|Text}
  */
 function findDOMNode(vnode) {
   if (!isComponent(vnode)) return vnode.dom;
@@ -77,6 +77,27 @@ function isTextNode(vnode) {
   return vnode.type === TEXT_NODE;
 }
 
+/**@param {VNode} vnode*/
+function isSVG(vnode) {
+  return (vnode.flags & IS_SVG) !== 0;
+}
+
+/**@param {VNode} vnode*/
+function applyFlags(vnode) {
+  if (vnode.type === "svg") {
+    vnode.flags = vnode.flags | IS_SVG;
+  }
+}
+
+/**
+ *
+ * @param {VNode} vnode
+ * @param {VNode} parentVnode
+ */
+function inheritProperties(vnode, parentVnode) {
+  vnode.flags = vnode.flags | (parentVnode.flags & INHERITED_FLAGS);
+}
+
 /**
  * Proxy an event to hooked event handlers
  * @param {Event} e The event object from the browser
@@ -95,6 +116,9 @@ const macroTask = setTimeout;
 export {
   isComponent,
   isTextNode,
+  isSVG,
+  applyFlags,
+  inheritProperties,
   ensureVNode,
   unmount,
   eventProxy,

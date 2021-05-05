@@ -1,10 +1,11 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
  */
 
 import { render } from "./render.js";
-import { ensureVNode, unmount } from "./utils.js";
+import { ensureVNode, inheritProperties, unmount } from "./utils.js";
 
 /**
  * Loop through child nodes of a node and render them
@@ -20,14 +21,14 @@ function renderChildren(vnode, prevVNode) {
   const children = vnode.children.flat(Infinity);
 
   const childVNodes = children.map((child, index) => {
-    child = ensureVNode(child);
+    const childVNode = ensureVNode(child);
 
     let childIndex = index;
     // Find previous node corresponding to this child node
     // TODO: add more info about keyed updates
     const prevChildVNode = prevChildNodes.find((node, i) => {
       if (node) {
-        if (node.type === child.type && child.key === node.key) {
+        if (node.type === childVNode.type && childVNode.key === node.key) {
           if (i === index) {
             // No change in position here
             // So, don't pass position.
@@ -43,7 +44,9 @@ function renderChildren(vnode, prevVNode) {
       return false;
     });
 
-    return render(child, domElement, prevChildVNode, childIndex);
+    inheritProperties(childVNode, vnode);
+
+    return render(childVNode, domElement, prevChildVNode, childIndex);
   });
 
   prevChildNodes.forEach((node) => {

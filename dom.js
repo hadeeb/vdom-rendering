@@ -1,14 +1,15 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
  */
 
-import { isTextNode } from "./utils.js";
+import { isTextNode, isSVG } from "./utils.js";
 
 /**
  * Create a DOM element and attach it to parent DOM element
  * @param {VNode} vnode virtual node to create a DOM node for
- * @param {HTMLElement} domElement parent DOM element of the node
+ * @param {HTMLElement|SVGElement|Text} domElement parent DOM element of the node
  * @param {VNode} prevVNode previous virtual node
  * @param {number} position position of node in the parent DOM
  */
@@ -52,7 +53,15 @@ function createDOMElement(vnode, prevVNode) {
       ? // In text nodes, props contains the text content
         // see utils.js L#17
         document.createTextNode(vnode.props)
-      : document.createElement(vnode.type);
+      : isSVG(vnode)
+      ? /**@type {SVGElement} */ (document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          /**@type {string}*/ (vnode.type),
+          { is: vnode.props.is }
+        ))
+      : document.createElement(/**@type {string}*/ (vnode.type), {
+          is: vnode.props.is,
+        });
   }
 }
 

@@ -1,3 +1,4 @@
+//@ts-check
 import { h } from "./createElement.js";
 import { render } from "./render.js";
 import {

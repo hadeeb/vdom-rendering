@@ -5,6 +5,7 @@
  */
 
 import { render } from "./render.js";
+import { inheritProperties } from "./utils.js";
 
 /**
  * The current component being rendered
@@ -20,7 +21,7 @@ let hookIndex = 0;
 /**
  * Render a component
  * @param {VNode} vnode virtual node to render
- * @param {HTMLElement} domElement DOM element to attach the node
+ * @param {HTMLElement|SVGElement|Text} domElement DOM element to attach the node
  * @param {VNode} prevVNode previous virtual node
  * @param {number} [position] position of node in the parent
  */
@@ -48,6 +49,8 @@ function renderComponent(vnode, domElement, prevVNode, position) {
   // Call the component function with props to get the node tree
   /**@type {VNode}*/
   const rootVNode = /**@type {function} */ (vnode.type)(props);
+
+  inheritProperties(rootVNode, vnode);
 
   vnode.rootVNode = render(
     rootVNode,

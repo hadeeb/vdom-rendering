@@ -25,7 +25,7 @@
  *
  *        eg: the text inside a `button`
  *
- * @property {HTMLElement|Text} [dom] DOM element to which VNode is attached
+ * @property {HTMLElement|SVGElement|Text} [dom] DOM element to which VNode is attached
  *
  *        If the node is a text node, this will be a `Text` element
  *
@@ -42,6 +42,7 @@
  * @property {any[]} [hooks] Component hooks
  *
  *        For component nodes, it's states & effects are stored here.
+ * @property {number} flags
  */
 
 /**
@@ -83,7 +84,11 @@ function h(type, props, ...children) {
     rootVNode: null,
     dom: null,
     hooks: null,
+    flags: 0,
   };
 }
 
-export { h, TEXT_NODE };
+const IS_SVG = 1;
+const INHERITED_FLAGS = IS_SVG;
+
+export { h, TEXT_NODE, IS_SVG, INHERITED_FLAGS };
