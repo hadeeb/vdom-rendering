@@ -1,16 +1,18 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
  */
 
-import { getHook, renderComponent } from "./component.js";
+import { getHook } from "./component.js";
+import { enqueue } from "./queue.js";
 import { microTask, macroTask } from "./utils.js";
 
 /**
  * @typedef StateHook
  * @type {object}
- * @property {any} state
- * @property {(action:any)=>void} dispatch
+ * @property {State} state
+ * @property {(action:Action)=>void} dispatch
  * @property {(prevState:State,action:Action)=>State} reducer
  * @template State,Action
  */
@@ -32,27 +34,21 @@ function useReducer(reducer, init) {
 
   if (!hookState.dispatch) {
     // Initialize hook
-    Object.assign(hookState, {
-      // State
-      state: typeof init === "function" ? init() : init,
-      // Update function aka `dispatch`
-      dispatch: (action) => {
-        // Calculate new state
-        const newValue = hookState.reducer(hookState.state, action);
+    hookState.state =
+      typeof init === "function" ? /**@type {() => State}*/ (init)() : init;
+    // Update function aka `dispatch`
+    hookState.dispatch = (action) => {
+      // Calculate new state
+      const newValue = hookState.reducer(hookState.state, action);
 
-        if (newValue !== hookState.state) {
-          // Update state if it has changed
-          hookState.state = newValue;
+      if (newValue !== hookState.state) {
+        // Update state if it has changed
+        hookState.state = newValue;
 
-          // Re-render the component
-          renderComponent(
-            currentComponent,
-            currentComponent.dom,
-            currentComponent
-          );
-        }
-      },
-    });
+        // Re-render the component
+        enqueue(currentComponent);
+      }
+    };
   }
 
   return [hookState.state, hookState.dispatch];
@@ -66,7 +62,7 @@ function useReducer(reducer, init) {
  */
 function reducerForUseState(prevState, newStateOrCallback) {
   return typeof newStateOrCallback === "function"
-    ? newStateOrCallback(prevState)
+    ? /**@type {(prev:T)=>T}*/ (newStateOrCallback)(prevState)
     : newStateOrCallback;
 }
 
@@ -111,7 +107,7 @@ function useLayoutEffect(callback, args) {
 /**
  * Effect hook
  * @param {()=>void|VoidFunction} callback effect
- * @param {any[]} [args] dependecy array of the effect
+ * @param {any[]} args dependecy array of the effect
  * @param {(callback: () => void) => void} delayFn when to execute the effect
  */
 function effectHook(callback, args, delayFn) {
@@ -124,11 +120,9 @@ function effectHook(callback, args, delayFn) {
     // Run cleanup for previous effect
     invokeEffectCleanup(hookState);
     // update hookState
-    Object.assign(hookState, {
-      args,
-      value: callback,
-      cleanup: null,
-    });
+    hookState.args = args;
+    hookState.value = callback;
+    hookState.cleanup = null;
 
     // Invoke the new effect
     invokeEffect(hookState, delayFn);
@@ -141,10 +135,11 @@ function effectHook(callback, args, delayFn) {
  * @param {any[]} args current dependencies of the hook
  */
 function hasArgsChanged(prevArgs, args) {
-  if (!prevArgs) {
+  if (!prevArgs || prevArgs.length !== args.length) {
     // 1. When the hook is initializing prevArgs will be undefined
     // 2. If the hook does not have any dependencies declared, prevArgs will be undefined
-    // In both cases hook should run
+    // 3. Length of dependency has changed
+    // Hook should run in all these cases
     return true;
   }
   // Check if any of the items in the dependencies array has changed

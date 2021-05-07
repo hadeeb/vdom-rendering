@@ -49,12 +49,12 @@ function renderChildren(vnode, prevVNode) {
     return render(childVNode, domElement, prevChildVNode, childIndex);
   });
 
-  prevChildNodes.forEach((node) => {
+  for (let node of prevChildNodes) {
     // All reused vnodes are removed from this array, remove the rest from DOM
     if (node) {
       unmount(node);
     }
-  });
+  }
 
   return childVNodes;
 }

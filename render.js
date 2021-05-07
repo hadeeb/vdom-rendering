@@ -4,7 +4,7 @@
  * @type {import("./createElement").VNode}
  */
 
-import { applyFlags, ensureVNode, isComponent } from "./utils.js";
+import { applyFlags, isComponent } from "./utils.js";
 import { diffProps } from "./diff-props.js";
 import { renderChildren } from "./diff-children.js";
 import { renderComponent } from "./component.js";
@@ -22,9 +22,6 @@ import { h } from "./createElement.js";
 function render(vnode, domElement, prevVNode, position) {
   if (vnode === prevVNode) return prevVNode;
   prevVNode = prevVNode ?? h();
-  // If vnode is a string/number/boolean/null,
-  // convert it into a vnode
-  vnode = ensureVNode(vnode);
   applyFlags(vnode);
 
   // Component

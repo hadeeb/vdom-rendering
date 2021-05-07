@@ -24,15 +24,16 @@ function diffProps(vnode, prevVNode) {
       /**@type {Text} */ (vnode.dom).data = newProps;
     } else {
       // Cleanup old props
-      Object.keys(prevProps).forEach((key) => {
+      for (let key of Object.keys(prevProps)) {
         if (key !== "key" && key !== "ref" && !(key in newProps)) {
           setDOMProperty(vnode, key, null, prevProps[key]);
         }
-      });
+      }
+
       // Iterate through new props
-      Object.keys(newProps).forEach((key) => {
+      for (let key of Object.keys(newProps)) {
         setDOMProperty(vnode, key, newProps[key], prevProps[key]);
-      });
+      }
     }
   }
 }

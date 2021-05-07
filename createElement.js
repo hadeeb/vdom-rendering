@@ -43,6 +43,7 @@
  *
  *        For component nodes, it's states & effects are stored here.
  * @property {number} flags
+ * @property {number} depth
  */
 
 /**
@@ -85,10 +86,13 @@ function h(type, props, ...children) {
     dom: null,
     hooks: null,
     flags: 0,
+    depth: 0,
   };
 }
 
 const IS_SVG = 1;
 const INHERITED_FLAGS = IS_SVG;
 
-export { h, TEXT_NODE, IS_SVG, INHERITED_FLAGS };
+const UPDATE_PENDING = 2;
+
+export { h, TEXT_NODE, IS_SVG, UPDATE_PENDING, INHERITED_FLAGS };

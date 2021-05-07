@@ -53,10 +53,14 @@ function cleanup(vnode) {
   if (isComponent(vnode)) {
     cleanup(vnode.rootVNode);
     // Invoke unmount effects
-    vnode.hooks.forEach(invokeEffectCleanup);
+    for (let hook of vnode.hooks) {
+      invokeEffectCleanup(hook);
+    }
   } else {
     // Recursively run cleanup for each child node
-    vnode.childVNodes.forEach(cleanup);
+    for (let childVNode of vnode.childVNodes) {
+      cleanup(childVNode);
+    }
   }
 }
 
@@ -95,6 +99,7 @@ function applyFlags(vnode) {
  * @param {VNode} parentVnode
  */
 function inheritProperties(vnode, parentVnode) {
+  vnode.depth = parentVnode.depth + 1;
   vnode.flags = vnode.flags | (parentVnode.flags & INHERITED_FLAGS);
 }
 

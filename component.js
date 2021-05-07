@@ -5,7 +5,8 @@
  */
 
 import { render } from "./render.js";
-import { inheritProperties } from "./utils.js";
+import { markAsUpdated } from "./queue.js";
+import { ensureVNode, inheritProperties } from "./utils.js";
 
 /**
  * The current component being rendered
@@ -26,9 +27,6 @@ let hookIndex = 0;
  * @param {number} [position] position of node in the parent
  */
 function renderComponent(vnode, domElement, prevVNode, position) {
-  // If there are no hooks, initialize an array
-  prevVNode.hooks = vnode.hooks = prevVNode.hooks ?? [];
-
   // Store current component, so hooks can read data from component
   currentComponent = prevVNode;
   //
@@ -47,10 +45,11 @@ function renderComponent(vnode, domElement, prevVNode, position) {
   const props = { children: vnode.children, ...vnode.props };
 
   // Call the component function with props to get the node tree
-  /**@type {VNode}*/
-  const rootVNode = /**@type {function} */ (vnode.type)(props);
+  const rootVNode = ensureVNode(/**@type {function} */ (vnode.type)(props));
 
   inheritProperties(rootVNode, vnode);
+
+  markAsUpdated(vnode);
 
   vnode.rootVNode = render(
     rootVNode,
@@ -61,13 +60,16 @@ function renderComponent(vnode, domElement, prevVNode, position) {
 
   // Assign parent DOM to vnode
   vnode.dom = domElement;
+  // Copy hooks from prevVNode
+  vnode.hooks = prevVNode.hooks;
 
   return Object.assign(prevVNode, vnode);
 }
 
 /**
  * get current hook and the component
- * @returns{[any,VNode]}
+ * @returns{[T,VNode]}
+ * @template T
  */
 function getHook() {
   // hookIndex is incremented after each access
@@ -75,12 +77,14 @@ function getHook() {
   // when another component starts rendering hookIndex will be reset to 0
   // see L#36
 
-  if (currentComponent.hooks.length <= index) {
+  const hooks = (currentComponent.hooks = currentComponent.hooks ?? []);
+
+  if (index >= hooks.length) {
     // This hook does not exist, so create a new Object
-    currentComponent.hooks[index] = {};
+    hooks.push({});
   }
 
-  return [currentComponent.hooks[index], currentComponent];
+  return [hooks[index], currentComponent];
 }
 
 export { renderComponent, getHook };
