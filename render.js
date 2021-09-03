@@ -4,7 +4,7 @@
  * @type {import("./createElement").VNode}
  */
 
-import { ensureVNode, isComponent } from "./utils.js";
+import { ensureVNode, isComponent, unmount } from "./utils.js";
 import { diffProps } from "./diff-props.js";
 import { renderChildren } from "./diff-children.js";
 import { renderComponent } from "./component.js";
@@ -20,8 +20,12 @@ import { h } from "./createElement.js";
  * @returns {VNode}
  */
 function render(vnode, domElement, prevVNode, position) {
-  if (vnode === prevVNode) return prevVNode;
-  prevVNode = prevVNode ?? h();
+  if (!prevVNode) {
+    prevVNode = h();
+  } else if (prevVNode.type !== vnode.type || prevVNode.key !== vnode.key) {
+    unmount(prevVNode);
+    prevVNode = h();
+  }
   // If vnode is a string/number/boolean/null,
   // convert it into a vnode
   vnode = ensureVNode(vnode);

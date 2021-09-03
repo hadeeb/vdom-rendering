@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
@@ -8,7 +9,7 @@ import { isTextNode } from "./utils.js";
 /**
  * Create a DOM element and attach it to parent DOM element
  * @param {VNode} vnode virtual node to create a DOM node for
- * @param {HTMLElement} domElement parent DOM element of the node
+ * @param {HTMLElement|Text} domElement parent DOM element of the node
  * @param {VNode} prevVNode previous virtual node
  * @param {number} position position of node in the parent DOM
  */
@@ -16,15 +17,9 @@ function addToDOM(vnode, domElement, prevVNode, position) {
   // If position is not defined,
   // new elements will be added to the end of the DOM element
 
-  const dom = createDOMElement(vnode, prevVNode);
+  const dom = prevVNode.dom ?? createDOMElement(vnode);
 
-  if (prevVNode.dom && dom !== prevVNode.dom) {
-    // not initial render and DOM element has changed,
-    // Replace with new DOM element
-    prevVNode.dom.replaceWith(dom);
-  }
-
-  if (!prevVNode.dom || position != null) {
+  if (dom !== prevVNode.dom || position != null) {
     // Initial render
     // OR
     // position has changed, see diff-children.js L#41
@@ -35,25 +30,15 @@ function addToDOM(vnode, domElement, prevVNode, position) {
 }
 
 /**
- * Create a DOM element if necessary, or return the previous element
+ * Create a DOM element
  * @param {VNode} vnode
- * @param {VNode} prevVNode
  */
-function createDOMElement(vnode, prevVNode) {
-  // During initial render, prevVNode.type will be undefined
-  // So, this condition will be false
-  if (prevVNode.type === vnode.type) {
-    // vnode type has not changed
-    // use the previous DOM element
-    return prevVNode.dom;
-  } else {
-    // Create DOM node
-    return isTextNode(vnode)
-      ? // In text nodes, props contains the text content
-        // see utils.js L#17
-        document.createTextNode(vnode.props)
-      : document.createElement(vnode.type);
-  }
+function createDOMElement(vnode) {
+  return isTextNode(vnode)
+    ? // In text nodes, props contains the text content
+      // see utils.js L#17
+      document.createTextNode(vnode.props)
+    : document.createElement(/**@type {string}*/ (vnode.type));
 }
 
 export { addToDOM };
