@@ -46,8 +46,9 @@ function renderComponent(vnode, domElement, prevVNode, position) {
   const props = { children: vnode.children, ...vnode.props };
 
   // Call the component function with props to get the node tree
-  /**@type {VNode}*/
-  const rootVNode = /**@type {function} */ (vnode.type)(props);
+  const rootVNode = /**@type {import("./createElement").Component<any>} */ (
+    vnode.type
+  )(props);
 
   vnode.rootVNode = render(
     rootVNode,

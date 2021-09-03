@@ -4,13 +4,13 @@
  * @typedef VNode
  * @type {object}
  *
- * @property {string|function} type Type of node.
+ * @property {string|Component<any>} type Type of node.
  *
  *        It will be a string for DOM elements like `div`,`button`,etc.
  *
  *        For components, it will the component function.
  *
- *        For text nodes, it will be TEXT_NODE
+ *        For text nodes, it will be `TEXT_NODE`
  *
  * @property {any} props Properties of the node
  *
@@ -45,6 +45,13 @@
  */
 
 /**
+ * Component function
+ * @typedef Component
+ * @type {(props:Props)=>VNode}
+ * @template {{}} Props
+ */
+
+/**
  * This variable is used as `type` of virtual nodes created for text content
  * @type {string}
  */
@@ -67,7 +74,7 @@ const TEXT_NODE = Symbol("TextNode");
  * <button name="button">Press me</div>
  * //will get converted to
  * h("button", { name:"button" }, "Press me")
- * @param {string|function} [type]
+ * @param {string|Component<any>} [type]
  * @param {object} [props]
  * @param {(VNode|string|number|null)[]} children
  * @returns {VNode}
