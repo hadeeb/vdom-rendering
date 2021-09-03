@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
@@ -17,7 +18,7 @@ function renderChildren(vnode, prevVNode) {
 
   // children may contain arrays, so flatten it.
   // TODO: add an example
-  const children = vnode.children.flat(Infinity);
+  const children = /**@type {VNode[]} */ (vnode.children).flat(Infinity);
 
   const childVNodes = children.map((child, index) => {
     child = ensureVNode(child);

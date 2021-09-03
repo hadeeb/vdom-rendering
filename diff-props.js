@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * @typedef VNode
  * @type {import("./createElement").VNode}
@@ -12,7 +13,7 @@ import { eventProxy, isTextNode } from "./utils.js";
  */
 function diffProps(vnode, prevVNode) {
   const domElement = vnode.dom;
-  
+
   const prevProps = prevVNode.props;
   const newProps = vnode.props;
 
@@ -27,12 +28,22 @@ function diffProps(vnode, prevVNode) {
       // Cleanup old props
       Object.keys(prevProps).forEach((key) => {
         if (key !== "key" && key !== "ref" && !(key in newProps)) {
-          setDOMProperty(domElement, key, null, prevProps[key]);
+          setDOMProperty(
+            /**@type {HTMLElement} */ (domElement),
+            key,
+            null,
+            prevProps[key]
+          );
         }
       });
       // Iterate through new props
       Object.keys(newProps).forEach((key) => {
-        setDOMProperty(domElement, key, newProps[key], prevProps[key]);
+        setDOMProperty(
+          /**@type {HTMLElement} */ (domElement),
+          key,
+          newProps[key],
+          prevProps[key]
+        );
       });
     }
   }
@@ -50,23 +61,28 @@ function setDOMProperty(domElement, key, newPropValue, prevPropValue) {
       // Do nothing
     } else if (key === "ref") {
       // Assign dom element to the ref
-      /**@type {import("./hooks.js").RefHook<HTMLElement>} */ (newPropValue).current = domElement;
+      /**@type {import("./hooks.js").RefHook<HTMLElement>} */ (
+        newPropValue
+      ).current = domElement;
     } else if (key.startsWith("on")) {
       // Events
       // An object is attached to the DOM element and
       // event listeners are stored there.
+      // @ts-ignore
       if (!domElement.vnodeListeners) {
+        // @ts-ignore
         domElement.vnodeListeners = {};
       }
       // Converting key to lowercase to support both
       // `onclick` and `onClick`
       const event = key.toLowerCase().slice(2);
+      // @ts-ignore
       domElement.vnodeListeners[event] = newPropValue;
       if (newPropValue) {
         if (!prevPropValue) {
           // Using a common event handler to avoid repeatedly removing
           // and adding event listeners
-          // eventProxy will invoke the currect listener using the
+          // eventProxy will invoke the correct listener using the
           // value of `event.type`
           domElement.addEventListener(event, eventProxy);
         }

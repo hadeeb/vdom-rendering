@@ -20,7 +20,7 @@ let hookIndex = 0;
 /**
  * Render a component
  * @param {VNode} vnode virtual node to render
- * @param {HTMLElement} domElement DOM element to attach the node
+ * @param {HTMLElement|Text} domElement DOM element to attach the node
  * @param {VNode} prevVNode previous virtual node
  * @param {number} [position] position of node in the parent
  */

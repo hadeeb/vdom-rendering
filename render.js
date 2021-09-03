@@ -14,7 +14,7 @@ import { h } from "./createElement.js";
 /**
  * Render a virtual node to DOM
  * @param {VNode} vnode Virtual node to render
- * @param {HTMLElement} domElement DOM element to attach the generated element
+ * @param {HTMLElement|Text} domElement DOM element to attach the generated element
  * @param {VNode} [prevVNode] previous virtual node, used for updating
  * @param {number} [position] the position of node in the parent
  * @returns {VNode}
