@@ -9,20 +9,21 @@ import { microTask, macroTask } from "./utils.js";
 /**
  * @typedef StateHook
  * @type {object}
- * @property {any} state
- * @property {(action:any)=>void} dispatch
- * @property {(prevState:State,action:Action)=>State} reducer
+ * @property {State} state
+ * @property {(action?:Action)=>void} dispatch
+ * @property {(prevState:State,action?:Action)=>State} reducer
  * @template State,Action
  */
 
 /**
  * useReducer hook
  * @param {(prevState:State,action:Action)=>State} reducer
- * @param {State|(()=>State)} init
- * @returns {[State,(action:Action)=>void]}
- * @template State,Action
+ * @param {State|(()=>State)|T} initialState
+ * @param {(x:T)=>State} [init]
+ * @returns {[State,(action?:Action)=>void]}
+ * @template State,Action,T
  */
-function useReducer(reducer, init) {
+function useReducer(reducer, initialState, init) {
   /**
    * @type {[StateHook<State,Action>,VNode]}
    */
@@ -34,7 +35,12 @@ function useReducer(reducer, init) {
     // Initialize hook
     Object.assign(hookState, {
       // State
-      state: typeof init === "function" ? init() : init,
+      state: init
+        ? init(initialState)
+        : reducerForUseState(
+            undefined,
+            /**@type {State|(()=>State)} */ (initialState)
+          ),
       // Update function aka `dispatch`
       dispatch: (action) => {
         // Calculate new state
@@ -66,7 +72,7 @@ function useReducer(reducer, init) {
  */
 function reducerForUseState(prevState, newStateOrCallback) {
   return typeof newStateOrCallback === "function"
-    ? newStateOrCallback(prevState)
+    ? /**@type {(prev:T)=>T}*/ (newStateOrCallback)(prevState)
     : newStateOrCallback;
 }
 
